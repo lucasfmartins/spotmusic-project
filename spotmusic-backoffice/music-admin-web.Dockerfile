@@ -1,18 +1,16 @@
-# spotmusic-web/Dockerfile
+# spotmusic-backoffice/Dockerfile
 
 # Use a imagem oficial do Node.js
 FROM node:16-alpine AS deps
-
-RUN apk add --no-cache libc6-compat
 
 # Configuração do diretório de trabalho
 WORKDIR /app
 
 # Copie o código-fonte para o diretório de trabalho
-COPY ./src /app
+COPY ./src /App
 
 # Instale as dependências
-RUN npm install
+# RUN npm install
 
 # Comando para iniciar a aplicação
 CMD ["npm", "start"]

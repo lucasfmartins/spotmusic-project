@@ -13,23 +13,34 @@ services:
   spotmusic-web:
     build:
       context: ./spotmusic-web
+      dockerfile: music-web.Dockerfile
     ports:
       - "3000:3000"
     # Caso necessário, adicione outras configurações necessárias para a aplicação ReactJS
+  
+  spotmusic-web-bff:
+    build:
+      context: ./spotmusic-web
+      dockerfile: music-bff.Dockerfile
+    ports:
+      - "3001:3000"
+    # Caso necessário, adicione outras configurações necessárias para a aplicação NodeJs
 
   spotmusic-backoffice:
     build:
       context: ./spotmusic-backoffice
+      dockerfile: music-admin-web.Dockerfile
     ports:
-      - "3000:3000"
+      - "3002:3000"
     # Caso necessário, adicione outras configurações necessárias para a aplicação ReactJS
 
-  spotmusic-bff:
+  spotmusic-backoffice-bff:
     build:
-      context: ./spotmusic-web/server
+      context: ./spotmusic-backoffice
+      dockerfile: music-admin-bff.Dockerfile
     ports:
-      - "3000:3000"
-    # Caso necessário, adicione outras configurações necessárias para a aplicação NodeJs
+      - "3003:3000"
+    # Caso necessário, adicione outras configurações necessárias para a aplicação ReactJS
 
   spotmusic-mobile:
     build:
@@ -81,18 +92,18 @@ services:
     networks:
       - app-tier
 
-  mongo:
-    image: "mongo:latest"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: mstemplate123
-      MONGO_INITDB_DATABASE: ms-template
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data_container:/data/db
-    networks:
-      - app-tier
+  # mongo:
+  #   image: "mongo:latest"
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: mstemplate123
+  #     MONGO_INITDB_DATABASE: ms-template
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongodb_data_container:/data/db
+  #   networks:
+  #     - app-tier
   
   keycloak:
     image: jboss/keycloak:6.0.1
@@ -102,7 +113,7 @@ services:
       KEYCLOAK_PASSWORD: admin
       DB_VENDOR: h2
       DB_DATABASE: keycloak
-      KEYCLOAK_IMPORT: /tmp/corp-realm.json
+      KEYCLOAK_IMPORT: /corp-realm.json
     volumes:
       - ./devtools/realms/corp-realm.json:/tmp/corp-realm.json
     ports:
