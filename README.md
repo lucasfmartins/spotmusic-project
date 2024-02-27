@@ -1,6 +1,6 @@
 # SpotMusic
 
-Este repositório é o monorepo central da plataforma SpotMusic, que reúne diversos projetos desenvolvidos em diferentes linguagens e tecnologias. Aqui, você encontrará uma variedade de aplicativos voltados para artistas, ouvintes e para uso interno da empresa. Cada projeto é cuidadosamente organizado em categorias distintas para facilitar a navegação e o gerenciamento.
+Este repositório é o monorepo central da plataforma SpotMusic, que reúne tanto os projetos web quanto mobile.
 
 ### spotmusic-web
 
