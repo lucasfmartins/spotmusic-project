@@ -1,6 +1,11 @@
-# SpotMusic
+<div align="center">
+  <h1>
+    SpotMusic
+  </h1>
 
-Este repositório é o monorepo central da plataforma SpotMusic, que reúne tanto os projetos web quanto mobile.
+  > “Monorepo central da plataforma SpotMusic, que reúne tanto os projetos web quanto mobile e backoffice.”
+</div>
+
 
 ### spotmusic-web
 
@@ -63,4 +68,4 @@ Certifique-se de ter o Docker e o Docker Compose instalados em sua máquina.
    - spotmusic-web: [http://localhost:3000](http://localhost:3000)
    - spotmusic-backoffice: [http://localhost:3002](http://localhost:3002)
 
-Certifique-se de ajustar as portas e URLs conforme necessário, dependendo das configurações do seu projeto. Essas são apenas instruções básicas, e você pode personalizar conforme a complexidade do seu ambiente.
+Certifique-se de ajustar as portas e URLs conforme necessário, dependendo das configurações do seu projeto
