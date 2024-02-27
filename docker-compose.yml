@@ -1,0 +1,91 @@
+version: "3.3"
+
+services:
+  spotmusic-api:
+    build:
+      context: ./spotmusic-api
+    ports:
+      - "5000:5000"
+    environment:
+      - FASTAPI_ENV=development
+    # Caso necessário, adicione outras configurações necessárias para a aplicação FastAPI
+
+  spotmusic-web:
+    build:
+      context: ./spotmusic-web
+    ports:
+      - "3000:3000"
+    # Caso necessário, adicione outras configurações necessárias para a aplicação ReactJS
+
+  spotmusic-mobile:
+    build:
+      context: ./spotmusic-mobile
+    # Caso necessário, Adicione outras configurações necessárias para a aplicação React Native
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  redpanda:
+    image: vectorized/redpanda:latest
+    ports:
+      - "9092:9092" 
+      - "8081:8081"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  mysql:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: example_password
+    volumes:
+      - mysql-data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:latest
+    ports:
+      - "5672:5672"  # Porta padrão para conexões AMQP
+      - "15672:15672"  # Porta para acesso ao painel de controle (opcional)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest 
+    volumes:
+      - ./data:/var/lib/rabbitmq
+
+  mongo:
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+  
+  keycloak:
+    image: jboss/keycloak:6.0.1
+    hostname: keycloak
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      DB_VENDOR: h2
+      DB_DATABASE: keycloak
+      KEYCLOAK_IMPORT: /tmp/corp-realm.json
+    volumes:
+      - ./devtools/realms/corp-realm.json:/tmp/corp-realm.json
+    ports:
+      - 8080:8080
+    expose:
+      - 8080
+    
+  zookeeper:
+    image: "wurstmeister/zookeeper:latest"
+    ports:
+      - "2181:2181"
+
+volumes:
+  redis-data:
+  mongo-data:
+  mysql-data:

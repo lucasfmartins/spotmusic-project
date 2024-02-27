@@ -1,0 +1,1 @@
+print("SpotMusic - Backend Service")
