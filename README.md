@@ -61,5 +61,6 @@ Certifique-se de ter o Docker e o Docker Compose instalados em sua máquina.
 
    - spotmusic-api: [http://localhost:5000](http://localhost:5000)
    - spotmusic-web: [http://localhost:3000](http://localhost:3000)
+   - spotmusic-backoffice: [http://localhost:3002](http://localhost:3002)
 
 Certifique-se de ajustar as portas e URLs conforme necessário, dependendo das configurações do seu projeto. Essas são apenas instruções básicas, e você pode personalizar conforme a complexidade do seu ambiente.
