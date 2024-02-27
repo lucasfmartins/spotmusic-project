@@ -1,3 +1,50 @@
+## Arquitetura de Componentes
+
+## Componentes Essenciais:
+
+### 1. Redpanda:
+   **Descrição:**
+     Redpanda é uma plataforma de streaming de dados distribuída, construída para lidar com altos volumes de dados em tempo real. Ele oferece recursos de streaming de dados escaláveis e de baixa latência, adequados para casos de uso que exigem processamento rápido de eventos, como análise em tempo real, processamento de logs e aplicativos de IoT.
+   **Justificativa:**
+     Ao utilizar o Redpanda, a Spotmusic pode lidar de forma eficiente com a ingestão, processamento e análise de grandes volumes de dados em tempo real. Isso permite que a plataforma forneça recursos como recomendações personalizadas com base no comportamento do usuário, atualizações em tempo real de tendências musicais e processamento de eventos de streaming de áudio.
+
+### 2. RabbitMQ:
+   **Descrição:**
+     Implementação do RabbitMQ para comunicação assíncrona entre os componentes da aplicação.
+   **Justificativa:**
+     Facilita a comunicação entre os serviços de forma assíncrona, permitindo a escalabilidade e o desacoplamento das funcionalidades.
+
+### 3. Redis - Amazon ElastiCache for Redis:
+   **Descrição:**
+     Uso do ElastiCache para caching e otimização de desempenho.
+   **Justificativa:**
+     Melhora a eficiência e a velocidade de acesso aos dados, especialmente útil para operações frequentes.
+
+### 4. Prometheus:
+   **Descrição:**
+     O Prometheus é um sistema de monitoramento e alerta de código aberto projetado para coletar métricas de sistemas e aplicativos. Ele oferece uma arquitetura flexível e poderosa, capaz de coletar dados em tempo real e armazená-los em seu banco de dados de séries temporais. Além disso, o Prometheus fornece recursos avançados de consulta e visualização de métricas, permitindo que os usuários monitorem o desempenho e a integridade de seus sistemas de forma eficaz.
+   **Justificativa:**
+     Ao integrar o Prometheus à infraestrutura da Spotmusic, a equipe de operações pode monitorar ativamente o desempenho e a disponibilidade dos componentes da aplicação. Isso inclui métricas relacionadas à utilização de recursos, latência, erros e muito mais. Além disso, o Prometheus oferece suporte a alertas configuráveis, permitindo que a equipe seja notificada rapidamente sobre quaisquer problemas que possam afetar a experiência do usuário.
+
+### 5. Grafana:
+   **Descrição:**
+     O Grafana é uma plataforma de análise e visualização de código aberto amplamente utilizada para monitoramento de métricas. Ele permite criar painéis e gráficos altamente personalizados a partir de uma variedade de fontes de dados, incluindo Prometheus, Elasticsearch, InfluxDB e muitos outros. Com uma interface intuitiva e recursos avançados de personalização, o Grafana é uma ferramenta poderosa para acompanhar o desempenho e a integridade dos sistemas em tempo real.
+   **Justificativa:**
+     Ao integrar o Grafana à infraestrutura da Spotmusic, a equipe de operações pode criar dashboards personalizados para visualizar e analisar métricas importantes. Isso inclui a capacidade de monitorar o desempenho dos serviços, identificar tendências, diagnosticar problemas e compartilhar insights com colegas de equipe. Com o Grafana, a Spotmusic pode tomar decisões informadas e rápidas para otimizar o desempenho e a confiabilidade da aplicação.
+
+### 6. Kong API Gateway:
+**Descrição:**
+Configuração do API Gateway para expor a Web API.
+**Justificativa:**
+      Simplifica a criação, manutenção e escalabilidade de APIs, facilitando a integração com serviços da AWS.
+
+### 7. Keycloak:
+   **Descrição:**
+     O Keycloak é uma solução de código aberto para gerenciamento de identidade e acesso, oferecendo recursos avançados de autenticação, autorização e federação de identidade. Ele fornece uma camada de segurança robusta para proteger os aplicativos da Spotmusic, gerenciando identidades de usuários, autenticando solicitações e autorizando o acesso a recursos protegidos. Além disso, o Keycloak oferece suporte a padrões de segurança amplamente adotados, como OAuth 2.0 e OpenID Connect, garantindo interoperabilidade e conformidade com as melhores práticas de segurança.
+   **Justificativa:**
+     Ao integrar o Keycloak à infraestrutura da Spotmusic, a equipe pode implementar uma autenticação e autorização centralizadas, garantindo a segurança dos dados e o controle de acesso aos serviços da aplicação. Isso inclui recursos avançados, como autenticação de dois fatores, políticas de senha personalizadas e integração com provedores de identidade externos. Com o Keycloak, a Spotmusic pode garantir a proteção adequada dos dados do usuário e a conformidade com os requisitos regulatórios de segurança.
+
+
 # Arquitetura de Infraestrutura da Spotmusic
 
 ## Componentes Essenciais:
@@ -68,47 +115,3 @@ Fornece um banco de dados gerenciado, escalável e altamente disponível para a 
    **Justificativa:**
      Ao utilizar o Amazon EKS, a Spotmusic pode implantar e gerenciar seus contêineres de forma eficiente, aproveitando as vantagens do Kubernetes, como orquestração avançada, escalabilidade automática, atualizações de aplicativos sem tempo de inatividade e integração contínua e entrega contínua (CI/CD). Isso permite que a equipe de desenvolvimento se concentre mais na criação de aplicativos e menos na administração da infraestrutura, resultando em maior produtividade e agilidade no desenvolvimento de software.
 
-
-## Componentes de Aplicação:
-
-### 1. Redpanda:
-   **Descrição:**
-     Redpanda é uma plataforma de streaming de dados distribuída, construída para lidar com altos volumes de dados em tempo real. Ele oferece recursos de streaming de dados escaláveis e de baixa latência, adequados para casos de uso que exigem processamento rápido de eventos, como análise em tempo real, processamento de logs e aplicativos de IoT.
-   **Justificativa:**
-     Ao utilizar o Redpanda, a Spotmusic pode lidar de forma eficiente com a ingestão, processamento e análise de grandes volumes de dados em tempo real. Isso permite que a plataforma forneça recursos como recomendações personalizadas com base no comportamento do usuário, atualizações em tempo real de tendências musicais e processamento de eventos de streaming de áudio.
-
-### 2. RabbitMQ:
-   **Descrição:**
-     Implementação do RabbitMQ para comunicação assíncrona entre os componentes da aplicação.
-   **Justificativa:**
-     Facilita a comunicação entre os serviços de forma assíncrona, permitindo a escalabilidade e o desacoplamento das funcionalidades.
-
-### 3. Redis - Amazon ElastiCache for Redis:
-   **Descrição:**
-     Uso do ElastiCache para caching e otimização de desempenho.
-   **Justificativa:**
-     Melhora a eficiência e a velocidade de acesso aos dados, especialmente útil para operações frequentes.
-
-### 4. Prometheus:
-   **Descrição:**
-     O Prometheus é um sistema de monitoramento e alerta de código aberto projetado para coletar métricas de sistemas e aplicativos. Ele oferece uma arquitetura flexível e poderosa, capaz de coletar dados em tempo real e armazená-los em seu banco de dados de séries temporais. Além disso, o Prometheus fornece recursos avançados de consulta e visualização de métricas, permitindo que os usuários monitorem o desempenho e a integridade de seus sistemas de forma eficaz.
-   **Justificativa:**
-     Ao integrar o Prometheus à infraestrutura da Spotmusic, a equipe de operações pode monitorar ativamente o desempenho e a disponibilidade dos componentes da aplicação. Isso inclui métricas relacionadas à utilização de recursos, latência, erros e muito mais. Além disso, o Prometheus oferece suporte a alertas configuráveis, permitindo que a equipe seja notificada rapidamente sobre quaisquer problemas que possam afetar a experiência do usuário.
-
-### 5. Grafana:
-   **Descrição:**
-     O Grafana é uma plataforma de análise e visualização de código aberto amplamente utilizada para monitoramento de métricas. Ele permite criar painéis e gráficos altamente personalizados a partir de uma variedade de fontes de dados, incluindo Prometheus, Elasticsearch, InfluxDB e muitos outros. Com uma interface intuitiva e recursos avançados de personalização, o Grafana é uma ferramenta poderosa para acompanhar o desempenho e a integridade dos sistemas em tempo real.
-   **Justificativa:**
-     Ao integrar o Grafana à infraestrutura da Spotmusic, a equipe de operações pode criar dashboards personalizados para visualizar e analisar métricas importantes. Isso inclui a capacidade de monitorar o desempenho dos serviços, identificar tendências, diagnosticar problemas e compartilhar insights com colegas de equipe. Com o Grafana, a Spotmusic pode tomar decisões informadas e rápidas para otimizar o desempenho e a confiabilidade da aplicação.
-
-### 6. Kong API Gateway:
-**Descrição:**
-Configuração do API Gateway para expor a Web API.
-**Justificativa:**
-      Simplifica a criação, manutenção e escalabilidade de APIs, facilitando a integração com serviços da AWS.
-
-### 7. Keycloak:
-   **Descrição:**
-     O Keycloak é uma solução de código aberto para gerenciamento de identidade e acesso, oferecendo recursos avançados de autenticação, autorização e federação de identidade. Ele fornece uma camada de segurança robusta para proteger os aplicativos da Spotmusic, gerenciando identidades de usuários, autenticando solicitações e autorizando o acesso a recursos protegidos. Além disso, o Keycloak oferece suporte a padrões de segurança amplamente adotados, como OAuth 2.0 e OpenID Connect, garantindo interoperabilidade e conformidade com as melhores práticas de segurança.
-   **Justificativa:**
-     Ao integrar o Keycloak à infraestrutura da Spotmusic, a equipe pode implementar uma autenticação e autorização centralizadas, garantindo a segurança dos dados e o controle de acesso aos serviços da aplicação. Isso inclui recursos avançados, como autenticação de dois fatores, políticas de senha personalizadas e integração com provedores de identidade externos. Com o Keycloak, a Spotmusic pode garantir a proteção adequada dos dados do usuário e a conformidade com os requisitos regulatórios de segurança.
