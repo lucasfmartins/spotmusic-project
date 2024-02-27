@@ -1,0 +1,46 @@
+# Experimental Branches Jobs
+# ==============================================================================
+#
+# Pipeline executed when the developer push to an Experimental Branch.
+
+.dep_cache: &dep_cache
+    key:
+        files:
+            - requirements.txt            
+    paths:
+        - venv
+
+
+# Publish this Experiment in Development environment to be experimented.
+Deploy Exp to Development:
+    stage: deploy
+    extends: .deploy
+    allow_failure: true
+    when: manual
+    environment:
+        name: development
+        url: $
+    variables:
+        ARG_ENVIRONMENT: "development"
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    only:
+        - /^exp/.*$/
+
+# Publish this Hotfix in PreProduction environment to be simulated.
+Deploy Exp to PreProduction:
+    stage: deploy
+    extends: .deploy
+    allow_failure: true
+    when: manual
+    environment:
+        name: preproduction
+        url: $
+    variables:
+        ARG_ENVIRONMENT: "preproduction"
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    only:
+        - /^exp/.*$/

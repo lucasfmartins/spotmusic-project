@@ -1,0 +1,68 @@
+# Common Jobs
+# ==============================================================================
+#
+# Contains all common jobs between WorkInProgress, MRs, Edge and Stable release scenarios.
+
+.dep_cache: &dep_cache
+    key:
+        files:            
+            - requirements.txt
+    paths:
+        - venv
+        - devtools/gateway/openapi.json
+
+.prevent_duplicate: &prevent_duplicate_rules
+    rules:
+        # Never run jobs for push actions on work branches when there is already an open merge request associated with it.
+        # To prevent duplicate pipelines between Branch and MR.
+        - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "master" && $CI_OPEN_MERGE_REQUESTS =~ /^./'
+          when: never
+        # Never run jobs for push actions that contains just a release commit.
+        # To prevent duplicate pipelines between Tag release and MR.
+        - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master" && $CI_COMMIT_MESSAGE =~ /chore\(release\)\:\spublish/'
+          when: never
+        - when: always
+
+# Install all project dependencies and cache.
+Install:
+    stage: install
+    before_script:
+        - apt-get update -qq && apt-get install -yqq --force-yes freetds-dev unixodbc-dev
+    script:
+        - bash ./devtools/cicd/build-venv.sh
+        - bash ./devtools/cicd/write-oas.sh
+    cache:
+        - <<: *dep_cache
+          policy: pull-push
+    <<: *prevent_duplicate_rules
+
+# Checks if the application unit tests are reaching the goal.
+Unit Tests:
+    stage: test
+    services:
+        - mongo
+        - redis
+    script:
+        - bash ./devtools/cicd/coverage.sh
+    coverage: /^TOTAL\D*\d+\s+\d+\s+(\d+\.?\d*%).*$/
+    artifacts:
+        reports:
+            junit: "coverage.xml"
+        paths:
+            - coverage.xml
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    <<: *prevent_duplicate_rules
+
+# Checks for coding inconsistencies statically.
+Lint:
+    stage: code-analysis
+    before_script:
+        - apt-get update -qq && apt-get install -yqq --force-yes freetds-dev unixodbc-dev
+    script:
+        - bash ./devtools/cicd/check-lint.sh
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    <<: *prevent_duplicate_rules

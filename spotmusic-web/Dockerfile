@@ -1,7 +1,7 @@
 # spotmusic-web/Dockerfile
 
 # Use a imagem oficial do Node.js
-FROM node:14-alpine
+FROM node:16-alpine AS deps
 
 # Configuração do diretório de trabalho
 WORKDIR /app

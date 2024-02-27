@@ -1,0 +1,29 @@
+# Hotfix Branches Jobs
+# ==============================================================================
+#
+# Pipeline executed when the developer push to a Hotfix Branch.
+
+.dep_cache: &dep_cache
+    key:
+        files:            
+            - requirements.txt
+    paths:
+        - venv
+
+
+# Publish this Hotfix in PreProduction environment to be simulated.
+Deploy Hotfix to PreProduction:
+    stage: deploy
+    extends: .deploy
+    allow_failure: true
+    when: manual
+    environment:
+        name: preproduction
+        url: $
+    variables:
+        ARG_ENVIRONMENT: "preproduction"
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    only:
+        - /^hotfix/.*$/

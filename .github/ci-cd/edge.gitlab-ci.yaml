@@ -1,0 +1,46 @@
+# Edge version Jobs
+# ==============================================================================
+#
+# Pipeline executed when new code is integrated into Trunk by merge.
+
+.dep_cache: &dep_cache
+    key:
+        files:
+            - requirements.txt            
+    paths:
+        - venv
+
+# Check for quality issues statically for this version.
+Sonar for Edge:
+    extends: .sonar
+    stage: code-analysis
+    before_script:
+        - export SONAR_URL=$STAGE_SONAR_URL
+        - export SONAR_TOKEN=$STAGE_SONAR_TOKEN
+        - export SONAR_PROJECT_KEY=$CI_PROJECT_NAME
+    variables:
+        SONAR_ANALYSIS_MODE: publish
+    only:
+        - master
+
+# Analyse security issues statically for this version.
+Security for Edge:
+    extends: .security
+    stage: code-analysis
+    only:
+        - master
+
+# Publish this version in Development environment.
+Deploy Edge to Development:
+    stage: deploy
+    extends: .deploy
+    environment:
+        name: development
+        url: $
+    variables:
+        ARG_ENVIRONMENT: "development"        
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    only:
+        - master

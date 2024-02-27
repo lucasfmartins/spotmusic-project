@@ -1,0 +1,168 @@
+# Merge Request Jobs
+# ==============================================================================
+#
+# Pipeline executed when the developer creates or updates a Merge Request to Trunk.
+
+.dep_cache: &dep_cache
+    key:
+        files:            
+            - requirements.txt
+    paths:
+        - venv
+
+# Always runs only for MRs targeting Trunk or UST
+.only_mr_to_trunk_or_ust_rules: &only_mr_to_trunk_or_ust_rules
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /feature\/UST/)'
+          when: always
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /feature\/UST/'
+          when: always
+
+# Allow failure Sonar only for MRs targeting UST
+.sonar_allow_failure_only_mr_to_ust_rules: &sonar_allow_failure_only_mr_to_ust_rules
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+          when: always
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /feature\/UST/'
+          when: manual
+          allow_failure: true    
+
+# Manual and optional run only for MRs targeting Trunk or UST
+.only_mr_to_trunk_or_ust_manual_optional: &only_mr_to_trunk_or_ust_manual_optional
+    rules:        
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+          when: manual
+          allow_failure: true
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /feature\/UST/'
+          when: manual
+          allow_failure: true
+
+# Manual run only for MRs targeting Trunk or UST
+.only_mr_to_trunk_or_ust_manual_rules: &only_mr_to_trunk_or_ust_manual_rules
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+          when: manual
+          allow_failure: true
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /feature\/UST/'
+          when: manual
+          allow_failure: true
+
+# Always runs only for MRs targeting Trunk and the last stage has failed.
+.only_mr_to_trunk_or_ust_on_failure_rules: &only_mr_to_trunk_or_ust_on_failure_rules
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+          when: on_failure
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+          when: on_failure
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /feature\/UST/'
+          when: on_failure
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /feature\/UST/'
+          when: on_failure
+
+# Checks if the current branch is up-to-date with Trunk (master).
+Check for Updates:
+    stage: sanity
+    script:
+        - export CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        - export MASTER_LAST_COMMIT=$(git ls-remote origin -h refs/heads/master | cut -f1)
+        - export CURRENT_BRANCH_UP_TO_DATE=$(git branch $CURRENT_BRANCH --contains $MASTER_LAST_COMMIT | wc -l)
+        - if [ "$CURRENT_BRANCH_UP_TO_DATE" == "0" ]; then echo -e "-------- WARNING --------\nThis branch is outdated regarding the master!\nMaster contains commits that are not on this branch!\nReview it before do the Merge Request!"; exit 1; else echo -e "Sanity check passed!\nThis branch is up to date with master."; fi
+    <<: *only_mr_to_trunk_or_ust_rules
+    cache: {}
+
+# Updates the source branch if it is outdated with Trunk or UST.
+Update Branch:
+    stage: post-sanity
+    needs: [ "Check for Updates" ]
+    before_script:
+        - bash ./scripts/ci-git-deep-clone.sh
+    script:
+        - git pull origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+        - git push --set-upstream origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    <<: *only_mr_to_trunk_or_ust_on_failure_rules
+
+
+# Check for security issues in dependencies.
+Check Dependencies:
+    image: python:3.10.0-buster
+    stage: code-analysis
+    script:
+        - bash ./devtools/cicd/safety.sh
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    <<: *only_mr_to_trunk_or_ust_rules
+
+# Checks for inconsistencies in commit messages.
+CommitLint:
+  stage: sanity
+  image: $CIKNIFE_IMAGE
+  script: ci-knife commitlint
+  cache: {}
+  <<: *only_mr_to_trunk_or_ust_rules
+
+# Check for quality issues statically for this MR.
+Sonar for MR:
+    extends: .sonar
+    stage: code-analysis
+    before_script:
+        - export SONAR_URL=$STAGE_SONAR_URL
+        - export SONAR_TOKEN=$STAGE_SONAR_TOKEN
+        - export SONAR_PROJECT_KEY=$CI_PROJECT_NAME
+        - export SONAR_BRANCH=""
+    variables:
+        SONAR_ANALYSIS_MODE: publish
+        SONAR_MERGE_REQUEST_ID: $CI_MERGE_REQUEST_ID
+        SONAR_MERGE_REQUEST_BRANCH: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+        SONAR_MERGE_REQUEST_BASE: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+        SONAR_BRANCH: ""
+    <<: *sonar_allow_failure_only_mr_to_ust_rules
+
+# Analyse security issues statically for this MR.
+Security for MR:
+    extends: .security
+    stage: code-analysis
+    <<: *only_mr_to_trunk_or_ust_rules
+
+# Publish this work in QA environment to be tested.
+Deploy MR to QA:
+    stage: deploy
+    extends: .deploy
+    environment:
+        name: qa
+        url: $CI_ENVIRONMENT_URL
+    variables:
+        ARG_ENVIRONMENT: "stage" # @TODO: Rename stage env to qa in cluster
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    <<: *only_mr_to_trunk_or_ust_manual_optional
+
+# Publish this work in PreProduction environment to be tested.
+Deploy MR to PreProduction*:
+    stage: deploy
+    extends: .deploy
+    allow_failure: true
+    environment:
+        name: preproduction
+        url: $CI_ENVIRONMENT_URL
+    variables:
+        ARG_ENVIRONMENT: "preproduction"
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    <<: *only_mr_to_trunk_or_ust_manual_rules
+
+# Publish this version in Development environment.
+Deploy MR to Development:
+    stage: deploy
+    extends: .deploy
+    environment:
+        name: development
+        url: $CI_ENVIRONMENT_URL
+    variables:
+        ARG_ENVIRONMENT: "development"        
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    <<: *only_mr_to_trunk_or_ust_manual_rules

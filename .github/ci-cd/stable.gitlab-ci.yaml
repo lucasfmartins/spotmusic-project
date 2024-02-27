@@ -1,0 +1,117 @@
+# Stable version Jobs
+# ==============================================================================
+#
+# Pipeline executed when new Stable version is released.
+.dep_cache: &dep_cache
+    key:
+        files:            
+            - requirements.txt
+    paths:
+        - venv
+
+# Release this version as Stable creating a Tag.
+Release Stable:
+    stage: release
+    image: $CIKNIFE_IMAGE
+    script:
+        - bash ./devtools/cicd/prepare-deploy.sh api
+        - ci-knife create-release -n -w -s
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    rules:
+        - if: '$CI_COMMIT_BRANCH == "master" && $CI_COMMIT_MESSAGE !~ /chore\(release\)\:\spublish/'
+          when: manual
+
+# Analyse quality, coverage and security issues statically.
+Sonar for Stable:
+    extends: .sonar
+    stage: code-analysis
+    before_script:
+        - export SONAR_URL=$SONAR_URL
+        - export SONAR_TOKEN=$SONAR_TOKEN
+        - export SONAR_PROJECT_KEY=$CI_PROJECT_NAME
+    variables:
+        SONAR_ANALYSIS_MODE: publish
+    only:
+        - tags
+
+# Analyse security issues statically.
+Security for Stable:
+    extends: .security
+    stage: code-analysis
+    variables:
+        FORTIFY_PROJECT_VERSION: master
+    only:
+        - tags
+
+Create GMUD:
+    stage: gmud
+    image: $CIKNIFE_IMAGE
+    script:
+        - ci-knife create-gmud
+    only:
+        - tags
+
+# Publish this work in QA environment to be tested.
+Deploy Stable to QA:
+    stage: deploy
+    extends: .deploy
+    when: manual
+    environment:
+        name: qa
+        url: $CI_ENVIRONMENT_URL
+    variables:        
+        ARG_ENVIRONMENT: "stage" # @TODO: Rename stage env to qa in cluster
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    only:
+        - tags
+
+# Publish this work in PreProduction environment to be tested.
+Deploy Stable to PreProduction:
+    stage: deploy
+    extends: .deploy
+    when: manual
+    environment:
+        name: preproduction
+        url: $CI_ENVIRONMENT_URL
+    variables:
+        ARG_ENVIRONMENT: "preproduction"        
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    only:
+        - tags
+
+Deploy Stable to Production:
+    stage: deploy    
+    extends: .deploy    
+    environment:
+        name: production
+        url: $CI_ENVIRONMENT_URL
+    variables:
+        ARG_VERSION: "${CI_COMMIT_REF_NAME}"
+        ARG_ENVIRONMENT: "production"
+        CHECK_GMUD_APPROVED: "true"        
+        SLACK_DEPLOY_CHANNEL: $CIKNIFE_SLACK_DEPLOY_CHANNEL
+    cache:
+        - <<: *dep_cache
+          policy: pull
+    rules:
+        - if: '$CI_COMMIT_TAG'
+          when: manual
+        - when: never
+
+Rollback:
+    stage: deploy
+    when: manual
+    variables:
+        ARGOCD_APPS: "me-risk-analysis-api"
+        ARGOCD_PATH: "production"        
+        SLACK_DEPLOY_CHANNEL: $CIKNIFE_SLACK_DEPLOY_CHANNEL
+    script:
+        - ci-knife argocd-rollback
+    only:
+        - tags
