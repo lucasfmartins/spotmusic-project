@@ -5,7 +5,7 @@ Este repositório é o monorepo central da plataforma SpotMusic, que reúne tant
 ### spotmusic-web
 
 - **Descrição:** Aplicação web em ReactJS.
-- **Tecnologias:** ReactJS.
+- **Tecnologias:** ReactJS, NodeJS
 - **Instruções de Instalação e Uso:** Consulte o [readme.md em spotmusic-web](spotmusic-web/README.md).
 
 ### spotmusic-mobile
@@ -22,7 +22,7 @@ Este repositório é o monorepo central da plataforma SpotMusic, que reúne tant
 
 ### spotmusic-api
 
-- **Descrição:** Uma API web em Python com FastAPI para o backend de aplicações SpotMusicStudio.
+- **Descrição:** Uma API web em Python com FastAPI para o backend de aplicações SpotMusic.
 - **Tecnologias:** Python, FastAPI.
 - **Instruções de Instalação e Uso:** Consulte o [readme.md em spotmusic-api](spotmusic-api/README.md).
 

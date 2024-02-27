@@ -17,6 +17,20 @@ services:
       - "3000:3000"
     # Caso necessário, adicione outras configurações necessárias para a aplicação ReactJS
 
+  spotmusic-backoffice:
+    build:
+      context: ./spotmusic-backoffice
+    ports:
+      - "3000:3000"
+    # Caso necessário, adicione outras configurações necessárias para a aplicação ReactJS
+
+  spotmusic-bff:
+    build:
+      context: ./spotmusic-web/server
+    ports:
+      - "3000:3000"
+    # Caso necessário, adicione outras configurações necessárias para a aplicação NodeJs
+
   spotmusic-mobile:
     build:
       context: ./spotmusic-mobile
@@ -28,6 +42,8 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+    networks:
+      - app-tier
 
   redpanda:
     image: vectorized/redpanda:latest
@@ -36,6 +52,8 @@ services:
       - "8081:8081"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - app-tier
 
   mysql:
     image: mysql:latest
@@ -45,24 +63,36 @@ services:
       MYSQL_ROOT_PASSWORD: example_password
     volumes:
       - mysql-data:/data/db
+    networks:
+      - app-tier
 
-  rabbitmq:
-    image: rabbitmq:latest
-    ports:
-      - "5672:5672"  # Porta padrão para conexões AMQP
-      - "15672:15672"  # Porta para acesso ao painel de controle (opcional)
+  rabbit:
+    image: rabbitmq:3-management
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest 
+      - RABBITMQ_ERLANG_COOKIE=mqadmin
+      - RABBITMQ_DEFAULT_USER=farlley_ferreira
+      - RABBITMQ_DEFAULT_PASS=mstemplate123
+      - CLUSTERED=true
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     volumes:
-      - ./data:/var/lib/rabbitmq
+      - ./volumes/rabbitmq:/var/lib/rabbitmq
+    networks:
+      - app-tier
 
   mongo:
     image: "mongo:latest"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mstemplate123
+      MONGO_INITDB_DATABASE: ms-template
     ports:
       - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - mongodb_data_container:/data/db
+    networks:
+      - app-tier
   
   keycloak:
     image: jboss/keycloak:6.0.1
@@ -79,13 +109,12 @@ services:
       - 8080:8080
     expose:
       - 8080
-    
-  zookeeper:
-    image: "wurstmeister/zookeeper:latest"
-    ports:
-      - "2181:2181"
 
 volumes:
   redis-data:
-  mongo-data:
+  mongodb_data_container:
   mysql-data:
+
+networks:
+  app-tier:
+    driver: bridge
