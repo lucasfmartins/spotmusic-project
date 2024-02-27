@@ -6,78 +6,73 @@
   > “Sistema monolito modular - SpotMusic”
 </div>
 
-External name: **spotmusic-api**
+Nome Externo: **spotmusic-api**
 
-## Install and run
+## Instalar e executar
 
 ### Virtualenv
 
-- If you choose to use pyenv it must be at least version 2.3.0:
+- Se você optar por usar pyenv, ele deve ter pelo menos a versão 2.3.0:
 
-- Your pipenv must be at least version 2021.5.29
+- Seu pipenv deve ter pelo menos a versão 2021.5.29
 
-- Create a Python version 3.10.2 environment and activate it.
+- Crie um ambiente Python na versão 3.10.2 e ative-o.
 
-Use these codes to check versions:
+Use estes códigos para verificar as versões:
 
     $ pipenv --version
     $ python --version
     $ pyenv --version
 
-### Configure the application environment
+### Configurar o ambiente da aplicação
 
-Copy and edit the .env file as needed.
+Copie e edite o arquivo .env conforme necessário.
 
     $ cp devtools/dotenv.dev .env
 
-Remember to set these envs in your .env file:
+Lembre-se de configurar essas variáveis de ambiente em seu arquivo .env:
 
 - USERNAME
 - PASSWORD
 - AUTH_CLIENT_TOKEN
 
-### Install dependencies
+### Instalar dependências
 
-Execute the following commands to install dependencies:
+Execute os seguintes comandos para instalar as dependências:
 
     $ make requirements-dev
 
-### Run application
+### Executar aplicação
 
-Execute the following command to run the application in a development environment:
+Execute o seguinte comando para executar a aplicação em um ambiente de desenvolvimento:
 
     $ make run-dev
 
-Execute the following command to run the application in a production environment:
+Execute o seguinte comando para executar a aplicação em um ambiente de produção:
 
     $ make run
 
-### Api documentation
+### Documentação da API
 
-The base address of RESTful API is [http://0.0.0.0:8000](http://0.0.0.0:8000)
-and Swagger documentation is [http://0.0.0.0:8000/docs](http://0.0.0.0:8000/docs)
+O endereço base da API RESTful é [http://0.0.0.0:8000](http://0.0.0.0:8000)
+e a documentação Swagger está em [http://0.0.0.0:8000/docs](http://0.0.0.0:8000/docs)
 
-## Outdated packages
 
-Execute the following command to list outdated packages:
+## Testes
 
-    $ make outdated
+### Testes Unitários
 
-## Testing
-
-### Unit tests
-
-Execute the following command to run all tests:
+Execute o seguinte comando para executar todos os testes:
 
     $ make test
 
-Execute the following command to run test with name match, example:
+Execute o seguinte comando para executar o teste com nome correspondente, por exemplo:
 
-    $ make test-matching test=test_should_order_rest
+    $ make test-matching test=test_should_music_test
 
-### Settings
+### Configurações
 
-You must have settings.json file in .vscode folder with this configuration:
+Você deve ter o arquivo settings.json na pasta .vscode com esta configuração:
 
     {
         "python.testing.pytestArgs": [
@@ -87,9 +82,9 @@ You must have settings.json file in .vscode folder with this configuration:
         "python.testing.pytestEnabled": true
     }
 
-## Debugging
+## Debugagem
 
-Create, if you haven't already done so, the .vscode folder and launc.json file inside the folder:
+Crie, se ainda não tiver feito, a pasta .vscode e o arquivo launch.json dentro da pasta:
 
     {
         "version": "0.2.0",
@@ -110,16 +105,16 @@ Create, if you haven't already done so, the .vscode folder and launc.json file i
 
 ## Lint
 
-Execute the following command to check lint:
+Execute o seguinte comando para verificar o lint:
 
     $ make check-lint
 
-Execute the following command to try fix lint:
+Execute o seguinte comando para tentar corrigir o lint:
 
     $ make lint
 
-## Security
+## Segurança
 
-Execute the following command to check security vulnerabilities in packages:
+Execute o seguinte comando para verificar vulnerabilidades de segurança nos pacotes:
 
     $ make safety
