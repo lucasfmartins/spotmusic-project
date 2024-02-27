@@ -45,7 +45,7 @@ Configuração do API Gateway para expor a Web API.
      Ao integrar o Keycloak à infraestrutura da Spotmusic, a equipe pode implementar uma autenticação e autorização centralizadas, garantindo a segurança dos dados e o controle de acesso aos serviços da aplicação. Isso inclui recursos avançados, como autenticação de dois fatores, políticas de senha personalizadas e integração com provedores de identidade externos. Com o Keycloak, a Spotmusic pode garantir a proteção adequada dos dados do usuário e a conformidade com os requisitos regulatórios de segurança.
 
 
-# Arquitetura de Infraestrutura da Spotmusic
+# Arquitetura de Infraestrutura
 
 ## Componentes Essenciais:
 
