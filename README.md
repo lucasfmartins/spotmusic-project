@@ -46,8 +46,7 @@ Certifique-se de ter o Docker e o Docker Compose instalados em sua máquina.
 1. Clone o repositório:
 
    ```bash
-   git clone https://github.com/seu-usuario/seu-repositorio.git
-   cd seu-repositorio
+   git clone https://github.com/seu-usuario/spotmusic-project.git
    ```
 
 2. Crie um arquivo `.env` na raiz do projeto e configure as variáveis de ambiente necessárias, se aplicável.
